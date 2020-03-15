@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+    server:
+        build:
+            context: .
+        container_name: blog-server
+        restart: always
+        networks:
+            - blog
+        ports:
+            - "8888:8888"
+        environment:
+          GOOGLE_APPLICATION_CREDENTIALS: "./creditcards-e312a-346e92c9176a.json"
+          GIN_MODE: "release"
+
+    postgres:
+        image: postgres:11.2-alpine
+        container_name: blog-postgres
+        restart: always
+        networks:
+            - blog 
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: blog 
+            POSTGRES_USER: blog 
+            POSTGRES_PASSWORD: blog 
+    pgadmin:
+        container_name: pgadmin_container
+        image: dpage/pgadmin4
+        environment:
+          PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+          PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        ports:
+          - "${PGADMIN_PORT:-5050}:80" 
+        networks:
+          - blog 
+volumes:
+    blog-postgres-volume:
+networks:
+    blog:
