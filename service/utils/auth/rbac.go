@@ -51,7 +51,8 @@ func GetAccessInstance() *Access {
 
 func (ac *Access) accessInitData() {
 	policy := []*model.Policy{
-		{Role: "admin", Path: "/v1/stations", Method: ".*"},
+		{Role: "general account", Path: "/api", Method: ".*"},
+		{Role: "trial account", Path: "/api", Method: "GET"},
 	}
 
 	_ = ac.Enforcer.LoadPolicy()
@@ -59,6 +60,5 @@ func (ac *Access) accessInitData() {
 	// for admin
 	for _, value := range policy {
 		ac.AddPolicy(value.Role, value.Path, value.Method)
-		ac.AddRoleForUser("harvey", value.Role)
 	}
 }

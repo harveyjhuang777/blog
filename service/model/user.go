@@ -1,9 +1,20 @@
 package model
 
+import "github.com/jinzhu/gorm"
+
 type User struct {
-	ID       int    `json:"id"`
-	Account  string `firestore:"account" form:"account"  json:"account"`
-	Name     string `firestore:"name" form:"name"  json:"name"`
-	Password string `firestore:"password" form:"password"  json:"password"`
-	Role     string `firestore:"role" form:"role"  json:"role"`
+	ID       uint    `gorm:"primary_key"`
+	Username string  `gorm:"column:username"`
+	Password string  `gorm:"column:password;not null"`
+	Email    string  `gorm:"column:email;unique_index"`
+	Bio      string  `gorm:"column:bio;size:1024"`
+	Image    *string `gorm:"column:image"`
+}
+
+type Follow struct {
+	gorm.Model
+	Following    User
+	FollowingID  uint
+	FollowedBy   User
+	FollowedByID uint
 }

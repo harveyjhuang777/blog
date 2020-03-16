@@ -61,33 +61,19 @@ func (uc *userUseCase) Login(c *gin.Context) (*model.Token, error) {
 }
 
 func (uc *userUseCase) Register(c *gin.Context) error {
-	/*
-		user := &model.User{}
-		err := c.BindJSON(user)
-		if err != nil {
-			return err
-		}
+	user := &model.User{}
+	err := c.BindJSON(user)
+	if err != nil {
+		return err
+	}
 
-		if err != gorm.ErrRecordNotFound && err != bolt.ErrKeyNotExists {
-			err = errors.New("user exists")
-			return err
-		}
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 
-		hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
+	user.Password = string(hash)
 
-		user.Password = string(hash)
-		user.Locked = false
-		user.CreatedAt = time.Now().UTC()
-		user.UpdateAt = time.Now().UTC()
-
-		err = uc.DB.AddOrUpdateUser(user)
-		if err != nil {
-			return err
-		}
-	*/
 	return nil
 }
 
@@ -107,9 +93,7 @@ func (uc *userUseCase) Take(c *gin.Context) (*model.User, error) {
 	}
 
 	return &model.User{
-		ID:       1,
-		Account:  "harvey",
+		Username: "harvey",
 		Password: string(hash),
-		Role:     "admin",
 	}, nil
 }

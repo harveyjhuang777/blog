@@ -16,9 +16,8 @@ func GenerateJWTToken(user *model.User, secretKey string) (token string, err err
 	nowTime := time.Now()
 	jwtToken := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
-	claims["id"] = strconv.Itoa(user.ID)
-	claims["account"] = user.Account
-	claims["role"] = user.Role
+	claims["id"] = strconv.FormatInt(int64(user.ID), 10)
+	claims["account"] = user.Email
 	claims["exp"] = nowTime.Add(time.Hour * time.Duration(1)).Unix()
 	claims["iat"] = nowTime.Unix()
 	jwtToken.Claims = claims

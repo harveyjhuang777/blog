@@ -7,7 +7,7 @@ import (
 	"github.com/jwjhuang/blog/service/app/logger"
 )
 
-var projectID = "creditcards-e312a"
+var projectID = "gorich"
 
 // Use a service account
 func NewFirestore() *firestore.Client {

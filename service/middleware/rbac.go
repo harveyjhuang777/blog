@@ -15,7 +15,7 @@ func AuthCheckRole() gin.HandlerFunc {
 
 		claims, ok := c.Get("claims")
 		if ok {
-			user = claims.(jwt.MapClaims)["account"]
+			user = claims.(jwt.MapClaims)["id"]
 		}
 
 		e := auth.GetAccessInstance()

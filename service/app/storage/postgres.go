@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/jwjhuang/blog/service/app/logger"
+	"github.com/jwjhuang/blog/service/model"
 	"github.com/jwjhuang/blog/service/utils/conf"
 )
 
@@ -32,4 +33,7 @@ func NewGORM() *gorm.DB {
 
 func migrateSchemas(gormdb *gorm.DB) {
 	logger.Log().Info("Start migrate schemas")
+	db := gormdb
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Follow{})
 }

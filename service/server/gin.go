@@ -36,14 +36,31 @@ func (srv *GinServer) globMiddleware() {
 }
 
 func (srv *GinServer) router() {
-	v1 := srv.server.Group("/v1")
+	api := srv.server.Group("/api")
 	{
-		v1.GET("/health", srv.controller.Health.HealthCheck)
+		api.GET("/health", srv.controller.Health.HealthCheck)
 
-		user := v1.Group("/users")
+		users := api.Group("/users")
 		{
-			user.POST("/login", srv.controller.User.Login)
+			users.POST("/login", srv.controller.User.Login)
+			users.POST("", srv.controller.User.Register)
 		}
 
+		user := api.Group("/user")
+		user.Use(middleware.JWTAuth())
+		user.Use(middleware.AuthCheckRole())
+		{
+			user.GET("", srv.controller.User.Get)
+			user.PUT("", srv.controller.User.Update)
+		}
+
+		profile := api.Group("/profiles")
+		profile.Use(middleware.JWTAuth())
+		profile.Use(middleware.AuthCheckRole())
+		{
+			profile.GET("", srv.controller.User.GetProfile)
+			profile.POST("/:username/follow", srv.controller.User.Follow)
+			profile.DELETE("/:username/follow", srv.controller.User.UnFollow)
+		}
 	}
 }
