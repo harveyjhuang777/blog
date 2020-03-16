@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/jwjhuang/blog/service/app/logger"
 	"github.com/jwjhuang/blog/service/model"
 	"github.com/jwjhuang/blog/service/utils/auth"
@@ -16,23 +15,17 @@ func newUser() IUserCenter {
 }
 
 type IUserCenter interface {
-	Login(c *gin.Context) (*model.Token, error)
-	Take(c *gin.Context) (*model.User, error)
+	Login(c *gin.Context, user *model.User) (*model.Token, error)
+	Register(c *gin.Context, user *model.User) error
+	GetUserByEmail(c *gin.Context, email string) (*model.User, error)
 }
 
 type userUseCase struct {
 }
 
-func (uc *userUseCase) Login(c *gin.Context) (*model.Token, error) {
+func (uc *userUseCase) Login(c *gin.Context, user *model.User) (*model.Token, error) {
 
-	user := &model.User{}
-	err := c.ShouldBindBodyWith(user, binding.JSON)
-	if err != nil {
-		logger.Log().Error(err)
-		return nil, err
-	}
-
-	dbUser, err := uc.Take(c)
+	dbUser, err := uc.GetUserByEmail(c, user.Email)
 	if err != nil {
 		logger.Log().Error(err)
 		return nil, err
@@ -60,12 +53,7 @@ func (uc *userUseCase) Login(c *gin.Context) (*model.Token, error) {
 	return token, nil
 }
 
-func (uc *userUseCase) Register(c *gin.Context) error {
-	user := &model.User{}
-	err := c.BindJSON(user)
-	if err != nil {
-		return err
-	}
+func (uc *userUseCase) Register(c *gin.Context, user *model.User) error {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -74,26 +62,18 @@ func (uc *userUseCase) Register(c *gin.Context) error {
 
 	user.Password = string(hash)
 
+	if err := dao.User.Insert(packet.DB, user); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (uc *userUseCase) Take(c *gin.Context) (*model.User, error) {
-
-	user := &model.User{}
-	err := c.ShouldBindBodyWith(user, binding.JSON)
+func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.User, error) {
+	resp, err := dao.User.GetUserByEmail(packet.DB, email)
 	if err != nil {
-		logger.Log().Error(err)
 		return nil, err
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte("test123"), bcrypt.DefaultCost)
-	if err != nil {
-		logger.Log().Error(err)
-		return nil, err
-	}
-
-	return &model.User{
-		Username: "harvey",
-		Password: string(hash),
-	}, nil
+	return resp, nil
 }

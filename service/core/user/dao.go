@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/jwjhuang/blog/service/model"
 )
 
@@ -27,9 +27,23 @@ func newUserDAO() IUserDAO {
 type userDAO struct{}
 
 type IUserDAO interface {
-	Insert(ctx *gin.Context, doc *model.User) error
+	Insert(db *gorm.DB, data *model.User) error
+	GetUserByEmail(db *gorm.DB, email string) (*model.User, error)
 }
 
-func (md *userDAO) Insert(ctx *gin.Context, doc *model.User) error {
+func (md *userDAO) Insert(db *gorm.DB, data *model.User) error {
+	if err := db.Create(data).Error; err != nil {
+		return err
+	}
 	return nil
+}
+
+func (md *userDAO) GetUserByEmail(db *gorm.DB, email string) (*model.User, error) {
+	user := &model.User{}
+
+	if err := db.Where("email = ?", email).First(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

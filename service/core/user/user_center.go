@@ -3,7 +3,7 @@ package user
 import (
 	"sync"
 
-	"cloud.google.com/go/firestore"
+	"github.com/jinzhu/gorm"
 	"go.uber.org/dig"
 )
 
@@ -33,7 +33,7 @@ func NewUserCenter(set userCenterSet) userCenter {
 type userCenterSet struct {
 	dig.In
 
-	DB *firestore.Client
+	DB *gorm.DB
 }
 
 type userCenter struct {
