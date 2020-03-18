@@ -1,51 +1,50 @@
 package errs
 
-import "errors"
-
-type code int
-
-const (
-	CodeFieldEmpty code = iota
-	CodeFieldInvalid
-	CodeNotFound
-	CodeConflict
-	CodeForbidden
-	CodeBadRequest
-	CodeServerError
+/*
+var (
+	dbErrorCode = map[int]error{
+		1005: DBInsertFailed,    // CANNOT_CREATE_TABLE
+		1006: DBInsertFailed,    // CANNOT_CREATE_DATABASE
+		1007: DBInsertFailed,    // DATABASE_CREATE_EXISTS
+		1040: DBOperationFailed, // TOO_MANY_CONNS
+		1045: DBAccessDenied,    // ACCESS_DENIED
+		1051: DBOperationFailed, // UNKNOWN_TABLE
+		1062: DBInsertDuplicate, //DUPLICATE_ENTRY
+	}
 )
 
-func (c code) Name() string {
-	names := [...]string{
-		"FIELD_EMPTY",
-		"FIELD_INVALID",
-		"NOT_FOUND",
-		"CONFLICT",
-		"FORBIDDEN",
-		"BAD_REQUEST",
-		"SERVER_ERROR",
+func ConvertDB(err error) error {
+	if err == sql.ErrNoRows {
+		return DBNoRows
 	}
-	return names[c]
+
+	if e, ok := parseDBError(err); ok {
+		return e
+	}
+
+	return err
 }
 
-var (
-	ErrNoRequestBody      = errors.New("no request body.")
-	ErrRecordFailed       = errors.New("record create failed.")
-	ErrInvalidRequest     = errors.New("something wrong in your request.")
-	ErrRecordExist        = errors.New("record already exists!")
-	ErrValueTooLong       = errors.New("field value too long.")
-	ErrFieldNotExist      = errors.New("field value not exists.")
-	ErrRecordNotFound     = errors.New("record not found.")
-	ErrServerError        = errors.New("server internal error.")
-	ErrInvalidTimeFormat  = errors.New("time format worng.")
-	ErrTimeOverlap        = errors.New("transaction time overlap.")
-	ErrNoAccessToken      = errors.New("no access token.")
-	ErrInvalidAccessToken = errors.New("access token invalid.")
-	ErrNoAccessRight      = errors.New("no access right.")
-)
+func parseDBError(err error) (error, bool) {
+	s := strings.TrimSpace(err.Error())
+	data := strings.Split(s, ":")
+	if len(data) == 0 {
+		return nil, false
+	}
 
-var (
-	TokenExpired     error = errors.New("Token is expired")
-	TokenNotValidYet error = errors.New("Token not active yet")
-	TokenMalformed   error = errors.New("That's not even a token")
-	TokenInvalid     error = errors.New("Couldn't handle this token")
-)
+	numStr := strings.ToLower(data[0])
+	numStr = strings.Replace(numStr, "error", "", -1)
+	numStr = strings.TrimSpace(numStr)
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		return nil, false
+	}
+
+	e, ok := dbErrorCode[num]
+	if !ok {
+		return nil, false
+	}
+
+	return e, true
+}
+*/

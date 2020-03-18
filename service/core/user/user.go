@@ -76,11 +76,6 @@ func (uc *userUseCase) Register(c *gin.Context, user *model.User) error {
 }
 
 func (uc *userUseCase) Update(c *gin.Context, user *model.User) error {
-	if err := validateUpdate(user); err != nil {
-		logger.Log().Error(err)
-		return err
-	}
-
 	dbUser, err := uc.GetUserByEmail(c, user.Email)
 	if err != nil {
 		logger.Log().Error(err)
@@ -120,14 +115,6 @@ func validateRegister(user *model.User) error {
 	}
 
 	if user.Password == "" {
-		return errs.ErrInvalidRequest
-	}
-
-	return nil
-}
-
-func validateUpdate(user *model.User) error {
-	if user.Email == "" {
 		return errs.ErrInvalidRequest
 	}
 

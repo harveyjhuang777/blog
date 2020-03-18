@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	SecretKey string = "hotel"
+	SecretKey string = "blog"
 )
 
 func GenerateJWTToken(user *model.User, secretKey string) (token string, err error) {
@@ -17,7 +17,7 @@ func GenerateJWTToken(user *model.User, secretKey string) (token string, err err
 	jwtToken := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	claims["id"] = strconv.FormatInt(int64(user.ID), 10)
-	claims["account"] = user.Email
+	claims["email"] = user.Email
 	claims["exp"] = nowTime.Add(time.Hour * time.Duration(1)).Unix()
 	claims["iat"] = nowTime.Unix()
 	jwtToken.Claims = claims

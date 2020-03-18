@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jwjhuang/blog/service/app/logger"
@@ -66,9 +67,24 @@ func (uc *userController) Register(c *gin.Context) {
 }
 
 func (uc *userController) Get(c *gin.Context) {
+	var email string
+
+	claims, ok := c.Get("claims")
+	if ok {
+		email = claims.(jwt.MapClaims)["email"].(string)
+	}
+
+	resp, err := uc.core.GetUserByEmail(c, email)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+	}
+	responseWithJSON(c, resp)
 }
 
 func (uc *userController) Update(c *gin.Context) {
+	var email string
+
 	user := &model.User{}
 	err := c.BindJSON(user)
 	if err != nil {
@@ -76,6 +92,12 @@ func (uc *userController) Update(c *gin.Context) {
 		abortWithError(c, http.StatusBadRequest, err)
 		return
 	}
+
+	claims, ok := c.Get("claims")
+	if ok {
+		email = claims.(jwt.MapClaims)["email"].(string)
+	}
+	user.Email = email
 
 	if err := uc.core.Update(c, user); err != nil {
 		logger.Log().Error(err)

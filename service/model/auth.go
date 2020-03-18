@@ -1,9 +1,9 @@
 package model
 
 type Token struct {
-	AccessToken string
-	TokenType   string
-	ExpiresIN   int
+	AccessToken string `json:"accessToken"`
+	TokenType   string `json:"tokenType"`
+	ExpiresIN   int    `json:"expiresIn"`
 }
 
 type Policy struct {

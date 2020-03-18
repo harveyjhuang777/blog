@@ -48,7 +48,7 @@ func (srv *GinServer) router() {
 
 		user := api.Group("/user")
 		user.Use(middleware.JWTAuth())
-		user.Use(middleware.AuthCheckRole())
+		//user.Use(middleware.AuthCheckRole())
 		{
 			user.GET("", srv.controller.User.Get)
 			user.PUT("", srv.controller.User.Update)

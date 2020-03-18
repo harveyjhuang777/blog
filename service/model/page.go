@@ -1,9 +1,9 @@
 package model
 
 type PageInfo struct {
-	PageIndex int    `form:"page-index" json:"page-index"`
-	PageSize  int    `form:"page-size" json:"page-size"`
-	PageOrder string `form:"page-order" json:"page-order"`
+	PageIndex int    `form:"page-index" json:"pageIndex"`
+	PageSize  int    `form:"page-size" json:"pageSize"`
+	PageOrder string `form:"page-order" json:"pageOrder"`
 }
 
 func (page *PageInfo) Validate() {
