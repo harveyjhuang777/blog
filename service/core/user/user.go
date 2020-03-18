@@ -7,6 +7,7 @@ import (
 	"github.com/jwjhuang/blog/service/app/logger"
 	"github.com/jwjhuang/blog/service/model"
 	"github.com/jwjhuang/blog/service/utils/auth"
+	"github.com/jwjhuang/blog/service/utils/errs"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,9 +15,11 @@ func newUser() IUserCenter {
 	return &userUseCase{}
 }
 
+//IUserCenter define user's capabilities
 type IUserCenter interface {
 	Login(c *gin.Context, user *model.User) (*model.Token, error)
 	Register(c *gin.Context, user *model.User) error
+	Update(c *gin.Context, user *model.User) error
 	GetUserByEmail(c *gin.Context, email string) (*model.User, error)
 }
 
@@ -54,6 +57,9 @@ func (uc *userUseCase) Login(c *gin.Context, user *model.User) (*model.Token, er
 }
 
 func (uc *userUseCase) Register(c *gin.Context, user *model.User) error {
+	if err := validateRegister(user); err != nil {
+		return err
+	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -69,6 +75,32 @@ func (uc *userUseCase) Register(c *gin.Context, user *model.User) error {
 	return nil
 }
 
+func (uc *userUseCase) Update(c *gin.Context, user *model.User) error {
+	if err := validateUpdate(user); err != nil {
+		logger.Log().Error(err)
+		return err
+	}
+
+	dbUser, err := uc.GetUserByEmail(c, user.Email)
+	if err != nil {
+		logger.Log().Error(err)
+		return err
+	}
+
+	updateData, err := prepareUpdate(dbUser, user)
+	if err != nil {
+		logger.Log().Error(err)
+		return err
+	}
+
+	if err := dao.User.Update(packet.DB, updateData); err != nil {
+		logger.Log().Error(err)
+		return err
+	}
+
+	return nil
+}
+
 func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.User, error) {
 	resp, err := dao.User.GetUserByEmail(packet.DB, email)
 	if err != nil {
@@ -76,4 +108,53 @@ func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.User
 	}
 
 	return resp, nil
+}
+
+func validateRegister(user *model.User) error {
+	if user.Email == "" {
+		return errs.ErrInvalidRequest
+	}
+
+	if user.Username == "" {
+		return errs.ErrInvalidRequest
+	}
+
+	if user.Password == "" {
+		return errs.ErrInvalidRequest
+	}
+
+	return nil
+}
+
+func validateUpdate(user *model.User) error {
+	if user.Email == "" {
+		return errs.ErrInvalidRequest
+	}
+
+	return nil
+}
+
+func prepareUpdate(old, new *model.User) (*model.User, error) {
+	if new.Username != "" {
+		old.Username = new.Username
+	}
+
+	if new.Password != "" {
+		hash, err := bcrypt.GenerateFromPassword([]byte(new.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, err
+		}
+
+		old.Password = string(hash)
+	}
+
+	if new.Bio != "" {
+		old.Bio = new.Bio
+	}
+
+	if new.Image != nil {
+		old.Image = new.Image
+	}
+
+	return old, nil
 }

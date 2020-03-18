@@ -69,6 +69,20 @@ func (uc *userController) Get(c *gin.Context) {
 }
 
 func (uc *userController) Update(c *gin.Context) {
+	user := &model.User{}
+	err := c.BindJSON(user)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := uc.core.Update(c, user); err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+	responseWithJSON(c, nil)
 }
 
 func (uc *userController) GetProfile(c *gin.Context) {

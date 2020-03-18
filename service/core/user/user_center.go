@@ -16,6 +16,7 @@ var (
 	ptr  *userCenter
 )
 
+//NewUserCenter generate user instance for external usage
 func NewUserCenter(set userCenterSet) userCenter {
 	once.Do(func() {
 		packet = set

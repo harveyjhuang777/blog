@@ -26,13 +26,22 @@ func newUserDAO() IUserDAO {
 
 type userDAO struct{}
 
+//IUserDAO is responsible for user data access controll
 type IUserDAO interface {
 	Insert(db *gorm.DB, data *model.User) error
+	Update(db *gorm.DB, data *model.User) error
 	GetUserByEmail(db *gorm.DB, email string) (*model.User, error)
 }
 
 func (md *userDAO) Insert(db *gorm.DB, data *model.User) error {
 	if err := db.Create(data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (md *userDAO) Update(db *gorm.DB, data *model.User) error {
+	if err := db.Save(data).Error; err != nil {
 		return err
 	}
 	return nil
