@@ -56,9 +56,9 @@ func (srv *GinServer) router() {
 
 		profile := api.Group("/profiles")
 		profile.Use(middleware.JWTAuth())
-		profile.Use(middleware.AuthCheckRole())
+		//profile.Use(middleware.AuthCheckRole())
 		{
-			profile.GET("", srv.controller.User.GetProfile)
+			profile.GET("/:username", srv.controller.User.GetProfile)
 			profile.POST("/:username/follow", srv.controller.User.Follow)
 			profile.DELETE("/:username/follow", srv.controller.User.UnFollow)
 		}
