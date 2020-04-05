@@ -23,6 +23,8 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
+		logger.Log().Debugf("token= %v", reqToken)
+
 		splitToken := strings.Split(reqToken, "Bearer ")
 		if len(splitToken) < 2 {
 			logger.Log().Error(errs.TokenInvalid)

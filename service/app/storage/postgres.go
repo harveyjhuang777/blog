@@ -35,5 +35,6 @@ func migrateSchemas(gormdb *gorm.DB) {
 	logger.Log().Info("Start migrate schemas")
 	db := gormdb
 	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Follow{})
+	db.AutoMigrate(&model.Article{})
+	db.AutoMigrate(&model.Tag{})
 }

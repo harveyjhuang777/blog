@@ -19,21 +19,21 @@ type IUserDAO interface {
 	GetUserByCondition(db *gorm.DB, cond *model.User) (*model.User, error)
 }
 
-func (md *userDAO) Insert(db *gorm.DB, data *model.User) error {
+func (ud *userDAO) Insert(db *gorm.DB, data *model.User) error {
 	if err := db.Create(data).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (md *userDAO) Update(db *gorm.DB, data *model.User) error {
+func (ud *userDAO) Update(db *gorm.DB, data *model.User) error {
 	if err := db.Save(data).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (md *userDAO) GetUserByEmail(db *gorm.DB, email string) (*model.User, error) {
+func (ud *userDAO) GetUserByEmail(db *gorm.DB, email string) (*model.User, error) {
 	user := &model.User{}
 
 	if err := db.Where("email = ?", email).First(user).Error; err != nil {
@@ -43,7 +43,7 @@ func (md *userDAO) GetUserByEmail(db *gorm.DB, email string) (*model.User, error
 	return user, nil
 }
 
-func (md *userDAO) GetUserByCondition(db *gorm.DB, cond *model.User) (*model.User, error) {
+func (ud *userDAO) GetUserByCondition(db *gorm.DB, cond *model.User) (*model.User, error) {
 	user := &model.User{}
 
 	if err := db.Where(cond).First(user).Error; err != nil {

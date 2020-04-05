@@ -6,12 +6,10 @@ var (
 
 func newDAO() {
 	dao = &storage{
-		User:    newUserDAO(),
-		Profile: newProfileDAO(),
+		User: newUserDAO(),
 	}
 }
 
 type storage struct {
-	User    IUserDAO
-	Profile IProfileDAO
+	User IUserDAO
 }

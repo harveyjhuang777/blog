@@ -4,158 +4,69 @@
 
 Make sure the right content type like `Content-Type: application/json; charset=utf-8` is correctly returned.
 
-### Users (for authentication)
+### Authentication
+``` JSON
+{
+    "status": 1,
+    "message": "",
+    "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhcnZleWpodWFuZ0BnbWFpbC5jb20iLCJleHAiOjE1ODYwNzQ2NzAsImlhdCI6MTU4NjA3MTA3MCwiaWQiOiIxIn0.4kLiw0BBjc9Fl4rendjK0Av2Zi30zHVo7q1B9XThbhQ",
+        "tokenType": "bearer",
+        "expiresIn": 3600
+    }
+}
+```
+
+
+### User
 
 ```JSON
 {
-  "user": {
-    "email": "jake@jake.jake",
-    "token": "jwt.token.here",
-    "username": "jake",
-    "bio": "I work at statefarm",
-    "image": null
-  }
+    "status": 1,
+    "message": "",
+    "data": {
+        "username": "Harvey",
+        "email": "harveyjhuang@example.com",
+        "bio": "I have a dream!",
+        "image": "https://example.com/my.jpg"
+    }
 }
 ```
 
 ### Profile
 
 ```JSON
-{
-  "profile": {
-    "username": "jake",
-    "bio": "I work at statefarm",
-    "image": "https://static.productionready.io/images/smiley-cyrus.jpg",
-    "following": false
-  }
-}
+
 ```
 
 ### Single Article
 
 ```JSON
-{
-  "article": {
-    "slug": "how-to-train-your-dragon",
-    "title": "How to train your dragon",
-    "description": "Ever wonder how?",
-    "body": "It takes a Jacobian",
-    "tagList": ["dragons", "training"],
-    "createdAt": "2016-02-18T03:22:56.637Z",
-    "updatedAt": "2016-02-18T03:48:35.824Z",
-    "favorited": false,
-    "favoritesCount": 0,
-    "author": {
-      "username": "jake",
-      "bio": "I work at statefarm",
-      "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      "following": false
-    }
-  }
-}
+
 ```
 
 ### Multiple Articles
 
 ```JSON
-{
-  "articles":[{
-    "slug": "how-to-train-your-dragon",
-    "title": "How to train your dragon",
-    "description": "Ever wonder how?",
-    "body": "It takes a Jacobian",
-    "tagList": ["dragons", "training"],
-    "createdAt": "2016-02-18T03:22:56.637Z",
-    "updatedAt": "2016-02-18T03:48:35.824Z",
-    "favorited": false,
-    "favoritesCount": 0,
-    "author": {
-      "username": "jake",
-      "bio": "I work at statefarm",
-      "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      "following": false
-    }
-  }, {
-    "slug": "how-to-train-your-dragon-2",
-    "title": "How to train your dragon 2",
-    "description": "So toothless",
-    "body": "It a dragon",
-    "tagList": ["dragons", "training"],
-    "createdAt": "2016-02-18T03:22:56.637Z",
-    "updatedAt": "2016-02-18T03:48:35.824Z",
-    "favorited": false,
-    "favoritesCount": 0,
-    "author": {
-      "username": "jake",
-      "bio": "I work at statefarm",
-      "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      "following": false
-    }
-  }],
-  "articlesCount": 2
-}
+
 ```
 
-### Single Comment
-
-```JSON
-{
-  "comment": {
-    "id": 1,
-    "createdAt": "2016-02-18T03:22:56.637Z",
-    "updatedAt": "2016-02-18T03:22:56.637Z",
-    "body": "It takes a Jacobian",
-    "author": {
-      "username": "jake",
-      "bio": "I work at statefarm",
-      "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      "following": false
-    }
-  }
-}
-```
-
-### Multiple Comments
-
-```JSON
-{
-  "comments": [{
-    "id": 1,
-    "createdAt": "2016-02-18T03:22:56.637Z",
-    "updatedAt": "2016-02-18T03:22:56.637Z",
-    "body": "It takes a Jacobian",
-    "author": {
-      "username": "jake",
-      "bio": "I work at statefarm",
-      "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      "following": false
-    }
-  }]
-}
-```
 
 ### List of Tags
 
 ```JSON
-{
-  "tags": [
-    "reactjs",
-    "angularjs"
-  ]
-}
+
 ```
 
 ### Errors and Status Codes
 
-If a request fails any validations, expect a 422 and errors in the following format:
+If a request fails any validations, expect a 400 and errors in the following format:
 
 ```JSON
 {
-  "errors":{
-    "body": [
-      "can't be empty"
-    ]
-  }
+    "status": 0,
+    "message": "pq: duplicate key value violates unique constraint \"uix_tag_tag\"",
+    "data": null
 }
 ```
 
@@ -177,14 +88,12 @@ If a request fails any validations, expect a 422 and errors in the following for
 Example request body:
 ```JSON
 {
-  "user":{
-    "email": "jake@jake.jake",
-    "password": "jakejake"
-  }
+    "email": "harveyjhuang@example.com",
+    "password": "test1234"
 }
 ```
 
-No authentication required, returns a [User](#users-for-authentication)
+No authentication required, returns a [Authentication](#authentication)
 
 Required fields: `email`, `password`
 
@@ -196,15 +105,13 @@ Required fields: `email`, `password`
 Example request body:
 ```JSON
 {
-  "user":{
-    "username": "Jacob",
-    "email": "jake@jake.jake",
-    "password": "jakejake"
-  }
+    "username": "Harvey",
+    "email": "harveyjhuang@example.com",
+    "password": "test1234"
 }
 ```
 
-No authentication required, returns a [User](#users-for-authentication)
+No authentication required, returns a [User](#user)
 
 Required fields: `email`, `username`, `password`
 
@@ -214,7 +121,7 @@ Required fields: `email`, `username`, `password`
 
 `GET /api/user`
 
-Authentication required, returns a [User](#users-for-authentication) that's the current user
+Authentication required, returns a [User](#user) that's the current user
 
 
 
@@ -237,35 +144,6 @@ Authentication required, returns the [User](#users-for-authentication)
 
 
 Accepted fields: `email`, `username`, `password`, `image`, `bio`
-
-
-
-### Get Profile
-
-`GET /api/profiles/:username`
-
-Authentication optional, returns a [Profile](#profile)
-
-
-
-### Follow user
-
-`POST /api/profiles/:username/follow`
-
-Authentication required, returns a [Profile](#profile)
-
-No additional parameters required
-
-
-
-### Unfollow user
-
-`DELETE /api/profiles/:username/follow`
-
-Authentication required, returns a [Profile](#profile)
-
-No additional parameters required
-
 
 
 ### List Articles
@@ -299,16 +177,6 @@ Offset/skip number of articles (default is 0):
 Authentication optional, will return [multiple articles](#multiple-articles), ordered by most recent first
 
 
-
-### Feed Articles
-
-`GET /api/articles/feed`
-
-Can also take `limit` and `offset` query parameters like [List Articles](#list-articles)
-
-Authentication required, will return [multiple articles](#multiple-articles) created by followed users, ordered by most recent first.
-
-
 ### Get Article
 
 `GET /api/articles/:slug`
@@ -339,7 +207,6 @@ Required fields: `title`, `description`, `body`
 Optional fields: `tagList` as an array of Strings
 
 
-
 ### Update Article
 
 `PUT /api/articles/:slug`
@@ -366,63 +233,6 @@ The `slug` also gets updated when the `title` is changed
 `DELETE /api/articles/:slug`
 
 Authentication required
-
-
-
-### Add Comments to an Article
-
-`POST /api/articles/:slug/comments`
-
-Example request body:
-
-```JSON
-{
-  "comment": {
-    "body": "His name was my name too."
-  }
-}
-```
-
-Authentication required, returns the created [Comment](#single-comment)
-
-Required field: `body`
-
-
-
-### Get Comments from an Article
-
-`GET /api/articles/:slug/comments`
-
-Authentication optional, returns [multiple comments](#multiple-comments)
-
-
-
-### Delete Comment
-
-`DELETE /api/articles/:slug/comments/:id`
-
-Authentication required
-
-
-
-### Favorite Article
-
-`POST /api/articles/:slug/favorite`
-
-Authentication required, returns the [Article](#single-article)
-
-No additional parameters required
-
-
-
-### Unfavorite Article
-
-`DELETE /api/articles/:slug/favorite`
-
-Authentication required, returns the [Article](#single-article)
-
-No additional parameters required
-
 
 
 ### Get Tags

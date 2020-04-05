@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,9 +21,6 @@ type IUserCenter interface {
 	Register(c *gin.Context, user *model.User) error
 	Update(c *gin.Context, user *model.User) error
 	GetUserByEmail(c *gin.Context, email string) (*model.UserResponse, error)
-	GetProfile(c *gin.Context, account, email string) (*model.ProfileResponse, error)
-	FollowUser(c *gin.Context, account, email string) (*model.ProfileResponse, error)
-	UnFollowUser(c *gin.Context, account, email string) (*model.ProfileResponse, error)
 }
 
 type userUseCase struct {
@@ -107,70 +103,6 @@ func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.User
 	}
 
 	return resp.GeUserResponse(), nil
-}
-
-func (uc *userUseCase) GetProfile(c *gin.Context, name, email string) (*model.ProfileResponse, error) {
-	me, err := dao.User.GetUserByEmail(packet.DB, email)
-	if err != nil {
-		return nil, err
-	}
-
-	view, err := dao.User.GetUserByCondition(packet.DB, &model.User{Username: name})
-	if err != nil {
-		return nil, err
-	}
-
-	isFollowing := dao.Profile.IsFollowing(packet.DB, view.ID, me.ID)
-
-	return view.GeProfileResponse(isFollowing), nil
-}
-
-func (uc *userUseCase) FollowUser(c *gin.Context, name, email string) (*model.ProfileResponse, error) {
-	me, err := dao.User.GetUserByEmail(packet.DB, email)
-	if err != nil {
-		return nil, err
-	}
-
-	view, err := dao.User.GetUserByCondition(packet.DB, &model.User{Username: name})
-	if err != nil {
-		return nil, err
-	}
-
-	if err := dao.Profile.FollowUser(packet.DB, view.ID, me.ID); err != nil {
-		return nil, err
-	}
-	logger.Log().Infof("name=%v, email=%v", name, email)
-
-	isFollowing := dao.Profile.IsFollowing(packet.DB, view.ID, me.ID)
-	if isFollowing != true {
-		return nil, errors.New("follow user failed")
-	}
-
-	return view.GeProfileResponse(isFollowing), nil
-}
-
-func (uc *userUseCase) UnFollowUser(c *gin.Context, name, email string) (*model.ProfileResponse, error) {
-	me, err := dao.User.GetUserByEmail(packet.DB, email)
-	if err != nil {
-		return nil, err
-	}
-
-	view, err := dao.User.GetUserByCondition(packet.DB, &model.User{Username: name})
-	if err != nil {
-		return nil, err
-	}
-
-	if err := dao.Profile.UnFollowUser(packet.DB, view.ID, me.ID); err != nil {
-		return nil, err
-	}
-	logger.Log().Infof("name=%v, email=%v", name, email)
-
-	isFollowing := dao.Profile.IsFollowing(packet.DB, view.ID, me.ID)
-	if isFollowing != false {
-		return nil, errors.New("unfollow user failed")
-	}
-
-	return view.GeProfileResponse(isFollowing), nil
 }
 
 func validateRegister(user *model.User) error {

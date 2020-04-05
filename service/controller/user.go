@@ -22,9 +22,6 @@ type IUserController interface {
 	Register(c *gin.Context)
 	Get(c *gin.Context)
 	Update(c *gin.Context)
-	GetProfile(c *gin.Context)
-	Follow(c *gin.Context)
-	UnFollow(c *gin.Context)
 }
 
 type userController struct {
@@ -105,58 +102,4 @@ func (uc *userController) Update(c *gin.Context) {
 		return
 	}
 	responseWithJSON(c, nil)
-}
-
-func (uc *userController) GetProfile(c *gin.Context) {
-	var email string
-
-	name := c.Param("username")
-
-	claims, ok := c.Get("claims")
-	if ok {
-		email = claims.(jwt.MapClaims)["email"].(string)
-	}
-
-	resp, err := uc.core.GetProfile(c, name, email)
-	if err != nil {
-		logger.Log().Error(err)
-		abortWithError(c, http.StatusBadRequest, err)
-	}
-	responseWithJSON(c, resp)
-}
-
-func (uc *userController) Follow(c *gin.Context) {
-	var email string
-
-	name := c.Param("username")
-
-	claims, ok := c.Get("claims")
-	if ok {
-		email = claims.(jwt.MapClaims)["email"].(string)
-	}
-
-	resp, err := uc.core.FollowUser(c, name, email)
-	if err != nil {
-		logger.Log().Error(err)
-		abortWithError(c, http.StatusBadRequest, err)
-	}
-	responseWithJSON(c, resp)
-}
-
-func (uc *userController) UnFollow(c *gin.Context) {
-	var email string
-
-	name := c.Param("username")
-
-	claims, ok := c.Get("claims")
-	if ok {
-		email = claims.(jwt.MapClaims)["email"].(string)
-	}
-
-	resp, err := uc.core.UnFollowUser(c, name, email)
-	if err != nil {
-		logger.Log().Error(err)
-		abortWithError(c, http.StatusBadRequest, err)
-	}
-	responseWithJSON(c, resp)
 }

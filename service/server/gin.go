@@ -54,13 +54,19 @@ func (srv *GinServer) router() {
 			user.PUT("", srv.controller.User.Update)
 		}
 
-		profile := api.Group("/profiles")
-		profile.Use(middleware.JWTAuth())
-		//profile.Use(middleware.AuthCheckRole())
+		articles := api.Group("/articles")
+		articles.Use(middleware.JWTAuth())
 		{
-			profile.GET("/:username", srv.controller.User.GetProfile)
-			profile.POST("/:username/follow", srv.controller.User.Follow)
-			profile.DELETE("/:username/follow", srv.controller.User.UnFollow)
+			articles.GET("", srv.controller.Article.List)
+			articles.GET("/:slug", srv.controller.Article.Get)
+			articles.POST("", srv.controller.Article.Create)
+			articles.PUT("/:slug", srv.controller.Article.Update)
+			articles.DELETE("/:slug", srv.controller.Article.Delete)
+		}
+
+		tags := api.Group("/tags")
+		{
+			tags.GET("", srv.controller.Article.TagList)
 		}
 	}
 }
