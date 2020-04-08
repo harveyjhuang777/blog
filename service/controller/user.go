@@ -22,6 +22,7 @@ type IUserController interface {
 	Register(c *gin.Context)
 	Get(c *gin.Context)
 	Update(c *gin.Context)
+	Profile(c *gin.Context)
 }
 
 type userController struct {
@@ -48,7 +49,7 @@ func (uc *userController) Login(c *gin.Context) {
 
 func (uc *userController) Register(c *gin.Context) {
 	user := &model.User{}
-	err := c.BindJSON(user)
+	err := c.ShouldBindBodyWith(user, binding.JSON)
 	if err != nil {
 		logger.Log().Error(err)
 		abortWithError(c, http.StatusBadRequest, err)
@@ -83,7 +84,7 @@ func (uc *userController) Update(c *gin.Context) {
 	var email string
 
 	user := &model.User{}
-	err := c.BindJSON(user)
+	err := c.ShouldBindBodyWith(user, binding.JSON)
 	if err != nil {
 		logger.Log().Error(err)
 		abortWithError(c, http.StatusBadRequest, err)
@@ -102,4 +103,15 @@ func (uc *userController) Update(c *gin.Context) {
 		return
 	}
 	responseWithJSON(c, nil)
+}
+
+func (uc *userController) Profile(c *gin.Context) {
+
+	resp, err := uc.core.GetProfile(c)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+	responseWithJSON(c, resp)
 }

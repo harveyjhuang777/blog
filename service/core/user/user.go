@@ -21,6 +21,7 @@ type IUserCenter interface {
 	Register(c *gin.Context, user *model.User) error
 	Update(c *gin.Context, user *model.User) error
 	GetUserByEmail(c *gin.Context, email string) (*model.UserResponse, error)
+	GetProfile(c *gin.Context) (*model.UserResponse, error)
 }
 
 type userUseCase struct {
@@ -98,6 +99,19 @@ func (uc *userUseCase) Update(c *gin.Context, user *model.User) error {
 
 func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.UserResponse, error) {
 	resp, err := dao.User.GetUserByEmail(packet.DB, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GeUserResponse(), nil
+}
+
+func (uc *userUseCase) GetProfile(c *gin.Context) (*model.UserResponse, error) {
+	var name = "Harvey"
+
+	cond := &model.UserGetCond{Username: &name}
+	query := model.NewQueryCond(cond)
+	resp, err := dao.User.GetUserByCondition(packet.DB, query)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/jwjhuang/blog/service/app/logger"
 	"github.com/jwjhuang/blog/service/core/article"
 	"github.com/jwjhuang/blog/service/model"
@@ -29,6 +30,21 @@ type articleController struct {
 }
 
 func (uc *articleController) List(c *gin.Context) {
+	cond := &model.ArticleGetCond{}
+	err := c.ShouldBindQuery(cond)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	res, err := uc.core.List(c, cond)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+	responseWithJSON(c, res)
 }
 
 func (uc *articleController) Feed(c *gin.Context) {
@@ -39,7 +55,7 @@ func (uc *articleController) Get(c *gin.Context) {
 
 func (uc *articleController) Create(c *gin.Context) {
 	cond := &model.ArticleCreateCond{}
-	err := c.BindJSON(cond)
+	err := c.ShouldBindBodyWith(cond, binding.JSON)
 	if err != nil {
 		logger.Log().Error(err)
 		abortWithError(c, http.StatusBadRequest, err)

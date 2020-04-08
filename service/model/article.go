@@ -8,7 +8,7 @@ type Article struct {
 	Title       string
 	Description string `gorm:"size:2048"`
 	Body        string `gorm:"size:2048"`
-	Tags        []Tag  `gorm:"many2many:article_tags"`
+	Tags        []*Tag `gorm:"many2many:article_tags"`
 }
 
 func (Article) TableName() string {
@@ -16,8 +16,8 @@ func (Article) TableName() string {
 }
 
 type Tag struct {
-	Tag      string    `gorm:"primary_key"`
-	Articles []Article `gorm:"many2many:article_tags"`
+	Tag      string     `gorm:"primary_key"`
+	Articles []*Article `gorm:"many2many:article_tags"`
 }
 
 func (Tag) TableName() string {
@@ -26,9 +26,9 @@ func (Tag) TableName() string {
 
 type ArticleGetCond struct {
 	Paging
-	Tag       string `form:"tag" json:"tag"`
-	Author    string `form:"author" json:"author"`
-	Favorited string `form:"favorited" json:"favorited"`
+	Tag       *string `form:"tag" json:"tag"`
+	Author    *string `form:"author" json:"author"`
+	Favorited *string `form:"favorited" json:"favorited"`
 }
 
 type ArticleCreateCond struct {

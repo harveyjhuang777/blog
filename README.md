@@ -33,12 +33,6 @@ Make sure the right content type like `Content-Type: application/json; charset=u
 }
 ```
 
-### Profile
-
-```JSON
-
-```
-
 ### Single Article
 
 ```JSON
@@ -65,7 +59,7 @@ If a request fails any validations, expect a 400 and errors in the following for
 ```JSON
 {
     "status": 0,
-    "message": "pq: duplicate key value violates unique constraint \"uix_tag_tag\"",
+    "message": "record not found",
     "data": null
 }
 ```
@@ -240,3 +234,24 @@ Authentication required
 `GET /api/tags`
 
 No authentication required, returns a [List of Tags](#list-of-tags)
+
+## TODO
+
+### API
+[x] Register
+[x] Login
+[ ] Profile
+[ ] Article
+    [ ] Create
+    [ ] Update
+    [ ] List
+    [ ] Get
+    [ ] Delete
+
+### Error Handle
+[ ] error definition 
+
+### GCP Setting
+[ ] TSL
+[ ] Firewall
+[ ] Cloud Run

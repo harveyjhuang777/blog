@@ -15,7 +15,8 @@ func newArticle() IArticleCenter {
 
 //IArticleCenter define article's capabilities
 type IArticleCenter interface {
-	Create(c *gin.Context, article *model.ArticleCreateCond) (*model.Article, error)
+	Create(c *gin.Context, cond *model.ArticleCreateCond) (*model.Article, error)
+	List(c *gin.Context, cond *model.ArticleGetCond) ([]*model.Article, error)
 }
 
 type articleUseCase struct {
@@ -34,7 +35,17 @@ func (uc *articleUseCase) Create(c *gin.Context, cond *model.ArticleCreateCond) 
 		return nil, err
 	}
 
-	res, err := dao.Article.Find(packet.DB, id)
+	res, err := dao.Article.FindOne(packet.DB, id)
+	if err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+	return res, nil
+}
+
+func (uc *articleUseCase) List(c *gin.Context, cond *model.ArticleGetCond) ([]*model.Article, error) {
+	query := model.NewQueryCond(cond)
+	res, err := dao.Article.List(packet.DB, query)
 	if err != nil {
 		logger.Log().Error(err)
 		return nil, err
@@ -62,9 +73,9 @@ func validateCreateArticle(c *gin.Context, cond *model.ArticleCreateCond) (*mode
 	}
 
 	if len(cond.TagList) > 0 {
-		tagList := []model.Tag{}
+		tagList := []*model.Tag{}
 		for _, t := range cond.TagList {
-			tag := model.Tag{
+			tag := &model.Tag{
 				Tag: t,
 			}
 			tagList = append(tagList, tag)

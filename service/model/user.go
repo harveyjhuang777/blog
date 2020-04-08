@@ -9,6 +9,15 @@ type User struct {
 	Image    *string `json:"image" gorm:"column:image"`
 }
 
+func (User) TableName() string {
+	return "user"
+}
+
+type UserGetCond struct {
+	Username *string `json:"username" gorm:"column:username;unique_index"`
+	Email    *string `json:"email" gorm:"column:email;unique_index"`
+}
+
 type UserResponse struct {
 	Username string  `json:"username"`
 	Email    string  `json:"email"`

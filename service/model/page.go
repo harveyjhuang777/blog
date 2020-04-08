@@ -1,28 +1,36 @@
 package model
 
+const (
+	pagingDefaultIndex = 1
+	pagingDefaultSize  = 25
+	pagingMaxSize      = 1000
+)
+
 type Paging struct {
 	Index int    `form:"pi" json:"pi"`
 	Size  int    `form:"ps" json:"ps"`
 	Order string `form:"po" json:"po"`
 }
 
-func (page *Paging) Validate() {
-	if page.Index == 0 {
-		page.Index = 1
+func (p *Paging) GetIndex() int {
+	if p.Index < 1 {
+		return pagingDefaultIndex
 	}
+	return p.Index
+}
 
-	if page.Size == 0 {
-		page.Size = 20
+func (p *Paging) GetSize() int {
+	if p.Size < 1 {
+		return pagingDefaultSize
 	}
+	if p.Size > pagingMaxSize {
+		return pagingMaxSize
+	}
+	return p.Size
+}
 
-	//prevent web attack
-	if page.Size > 1000 {
-		page.Size = 1000
-	}
-
-	if page.Order == "" {
-		page.Order = "id"
-	}
+func (p *Paging) GetOffset() int {
+	return p.GetSize() * (p.GetIndex() - 1)
 }
 
 func NewPagingResult(paging *Paging, count int) *PagingResult {

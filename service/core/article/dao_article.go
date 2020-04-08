@@ -15,7 +15,8 @@ type articleDAO struct{}
 //IArticleDAO is responsible for article data access controll
 type IArticleDAO interface {
 	Insert(db *gorm.DB, data *model.Article) (uint, error)
-	Find(db *gorm.DB, id uint) (*model.Article, error)
+	FindOne(db *gorm.DB, id uint) (*model.Article, error)
+	List(db *gorm.DB, cond model.IQueryCond) ([]*model.Article, error)
 	//Update(db *gorm.DB, data *model.Article) error
 }
 
@@ -30,12 +31,36 @@ func (ad *articleDAO) Insert(db *gorm.DB, data *model.Article) (uint, error) {
 	return data.ID, tx.Commit().Error
 }
 
-func (ad *articleDAO) Find(db *gorm.DB, id uint) (*model.Article, error) {
+func (ad *articleDAO) FindOne(db *gorm.DB, id uint) (*model.Article, error) {
+	var tags []*model.Tag
+
 	res := &model.Article{}
 
 	if err := db.Where("id = ?", id).First(res).Error; err != nil {
 		logger.Log().Error(err)
 		return nil, err
+	}
+
+	db.Model(res).Related(&tags, "Tags")
+
+	res.Tags = tags
+
+	return res, nil
+}
+
+func (ad *articleDAO) List(db *gorm.DB, query model.IQueryCond) ([]*model.Article, error) {
+	var tags []*model.Tag
+
+	res := []*model.Article{}
+	paging := query.Paging()
+	if err := db.Where(query.Where()).Find(&res).Offset(paging.GetOffset()).Limit(paging.GetSize()).Error; err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+
+	for _, article := range res {
+		db.Model(article).Related(&tags, "Tags")
+		article.Tags = tags
 	}
 
 	return res, nil
