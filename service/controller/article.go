@@ -8,6 +8,7 @@ import (
 	"github.com/jwjhuang/blog/service/app/logger"
 	"github.com/jwjhuang/blog/service/core/article"
 	"github.com/jwjhuang/blog/service/model"
+	"github.com/jwjhuang/blog/service/utils/errs"
 )
 
 func newArticleController(core article.IArticleCenter) IArticleController {
@@ -47,10 +48,21 @@ func (uc *articleController) List(c *gin.Context) {
 	responseWithJSON(c, res)
 }
 
-func (uc *articleController) Feed(c *gin.Context) {
-}
-
 func (uc *articleController) Get(c *gin.Context) {
+	slug := c.Param("slug")
+	if slug == "" {
+		logger.Log().Error(errs.ErrInvalidRequest)
+		abortWithError(c, http.StatusBadRequest, errs.ErrInvalidRequest)
+		return
+	}
+
+	res, err := uc.core.GetBySlug(c, slug)
+	if err != nil {
+		logger.Log().Error(err)
+		abortWithError(c, http.StatusBadRequest, err)
+		return
+	}
+	responseWithJSON(c, res)
 }
 
 func (uc *articleController) Create(c *gin.Context) {

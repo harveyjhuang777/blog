@@ -15,8 +15,10 @@ type articleDAO struct{}
 //IArticleDAO is responsible for article data access controll
 type IArticleDAO interface {
 	Insert(db *gorm.DB, data *model.Article) (uint, error)
-	FindOne(db *gorm.DB, id uint) (*model.Article, error)
 	List(db *gorm.DB, cond model.IQueryCond) ([]*model.Article, error)
+	GetByID(db *gorm.DB, id uint) (*model.Article, error)
+	GetBySlug(db *gorm.DB, slug string) (*model.Article, error)
+	GetByCondition(db *gorm.DB, cond model.IQueryCond) (*model.Article, error)
 	//Update(db *gorm.DB, data *model.Article) error
 }
 
@@ -29,23 +31,6 @@ func (ad *articleDAO) Insert(db *gorm.DB, data *model.Article) (uint, error) {
 	}
 
 	return data.ID, tx.Commit().Error
-}
-
-func (ad *articleDAO) FindOne(db *gorm.DB, id uint) (*model.Article, error) {
-	var tags []*model.Tag
-
-	res := &model.Article{}
-
-	if err := db.Where("id = ?", id).First(res).Error; err != nil {
-		logger.Log().Error(err)
-		return nil, err
-	}
-
-	db.Model(res).Related(&tags, "Tags")
-
-	res.Tags = tags
-
-	return res, nil
 }
 
 func (ad *articleDAO) List(db *gorm.DB, query model.IQueryCond) ([]*model.Article, error) {
@@ -62,6 +47,57 @@ func (ad *articleDAO) List(db *gorm.DB, query model.IQueryCond) ([]*model.Articl
 		db.Model(article).Related(&tags, "Tags")
 		article.Tags = tags
 	}
+
+	return res, nil
+}
+
+func (ad *articleDAO) GetByID(db *gorm.DB, id uint) (*model.Article, error) {
+	var tags []*model.Tag
+
+	res := &model.Article{}
+
+	if err := db.Where("id = ?", id).First(res).Error; err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+
+	db.Model(res).Related(&tags, "Tags")
+
+	res.Tags = tags
+
+	return res, nil
+}
+
+func (ad *articleDAO) GetBySlug(db *gorm.DB, slug string) (*model.Article, error) {
+	var tags []*model.Tag
+
+	res := &model.Article{}
+
+	if err := db.Where("slug = ?", slug).First(res).Error; err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+
+	db.Model(res).Related(&tags, "Tags")
+
+	res.Tags = tags
+
+	return res, nil
+}
+
+func (ad *articleDAO) GetByCondition(db *gorm.DB, cond model.IQueryCond) (*model.Article, error) {
+	var tags []*model.Tag
+
+	res := &model.Article{}
+
+	if err := db.Where(cond.Where()).First(res).Error; err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+
+	db.Model(res).Related(&tags, "Tags")
+
+	res.Tags = tags
 
 	return res, nil
 }

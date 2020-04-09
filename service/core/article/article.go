@@ -17,6 +17,7 @@ func newArticle() IArticleCenter {
 type IArticleCenter interface {
 	Create(c *gin.Context, cond *model.ArticleCreateCond) (*model.Article, error)
 	List(c *gin.Context, cond *model.ArticleGetCond) ([]*model.Article, error)
+	GetBySlug(c *gin.Context, slug string) (*model.Article, error)
 }
 
 type articleUseCase struct {
@@ -35,7 +36,7 @@ func (uc *articleUseCase) Create(c *gin.Context, cond *model.ArticleCreateCond) 
 		return nil, err
 	}
 
-	res, err := dao.Article.FindOne(packet.DB, id)
+	res, err := dao.Article.GetByID(packet.DB, id)
 	if err != nil {
 		logger.Log().Error(err)
 		return nil, err
@@ -46,6 +47,15 @@ func (uc *articleUseCase) Create(c *gin.Context, cond *model.ArticleCreateCond) 
 func (uc *articleUseCase) List(c *gin.Context, cond *model.ArticleGetCond) ([]*model.Article, error) {
 	query := model.NewQueryCond(cond)
 	res, err := dao.Article.List(packet.DB, query)
+	if err != nil {
+		logger.Log().Error(err)
+		return nil, err
+	}
+	return res, nil
+}
+
+func (uc *articleUseCase) GetBySlug(c *gin.Context, slug string) (*model.Article, error) {
+	res, err := dao.Article.GetBySlug(packet.DB, slug)
 	if err != nil {
 		logger.Log().Error(err)
 		return nil, err

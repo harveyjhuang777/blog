@@ -20,7 +20,7 @@ type IUserCenter interface {
 	Login(c *gin.Context, user *model.User) (*model.Token, error)
 	Register(c *gin.Context, user *model.User) error
 	Update(c *gin.Context, user *model.User) error
-	GetUserByEmail(c *gin.Context, email string) (*model.UserResponse, error)
+	GetByEmail(c *gin.Context, email string) (*model.UserResponse, error)
 	GetProfile(c *gin.Context) (*model.UserResponse, error)
 }
 
@@ -29,7 +29,7 @@ type userUseCase struct {
 
 func (uc *userUseCase) Login(c *gin.Context, user *model.User) (*model.Token, error) {
 
-	dbUser, err := dao.User.GetUserByEmail(packet.DB, user.Email)
+	dbUser, err := dao.User.GetByEmail(packet.DB, user.Email)
 	if err != nil {
 		logger.Log().Error(err)
 		return nil, err
@@ -77,7 +77,7 @@ func (uc *userUseCase) Register(c *gin.Context, user *model.User) error {
 }
 
 func (uc *userUseCase) Update(c *gin.Context, user *model.User) error {
-	dbUser, err := dao.User.GetUserByEmail(packet.DB, user.Email)
+	dbUser, err := dao.User.GetByEmail(packet.DB, user.Email)
 	if err != nil {
 		logger.Log().Error(err)
 		return err
@@ -97,8 +97,8 @@ func (uc *userUseCase) Update(c *gin.Context, user *model.User) error {
 	return nil
 }
 
-func (uc *userUseCase) GetUserByEmail(c *gin.Context, email string) (*model.UserResponse, error) {
-	resp, err := dao.User.GetUserByEmail(packet.DB, email)
+func (uc *userUseCase) GetByEmail(c *gin.Context, email string) (*model.UserResponse, error) {
+	resp, err := dao.User.GetByEmail(packet.DB, email)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (uc *userUseCase) GetProfile(c *gin.Context) (*model.UserResponse, error) {
 
 	cond := &model.UserGetCond{Username: &name}
 	query := model.NewQueryCond(cond)
-	resp, err := dao.User.GetUserByCondition(packet.DB, query)
+	resp, err := dao.User.GetByCondition(packet.DB, query)
 	if err != nil {
 		return nil, err
 	}

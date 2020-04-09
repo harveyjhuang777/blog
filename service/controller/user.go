@@ -72,7 +72,7 @@ func (uc *userController) Get(c *gin.Context) {
 		email = claims.(jwt.MapClaims)["email"].(string)
 	}
 
-	resp, err := uc.core.GetUserByEmail(c, email)
+	resp, err := uc.core.GetByEmail(c, email)
 	if err != nil {
 		logger.Log().Error(err)
 		abortWithError(c, http.StatusBadRequest, err)
